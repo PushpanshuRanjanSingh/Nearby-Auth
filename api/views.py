@@ -88,23 +88,17 @@ class ChangePasswordView(generics.UpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-import smtplib, ssl, sys
+import smtplib
 class SendMail(APIView):
     def post(self, request, *args, **kwargs):
-        port = 465  # For SSL
-        smtp_server = "smtp.gmail.com"
+        s = smtplib.SMTP('smtp.gmail.com', 587)
+        s.starttls()
         sender_email = "spushpanshu@gmail.com"  # Enter your address
         receiver_email = [request.data["email"]]
         password = "shashi123"
+        s.login(sender_email,password)
         message = "Subject: "+request.data["subject"]+"\n"+"Your one time pin (OTP) code is: "+request.data['otp']+"\nOTP is valid for the next 15 minutes only.\nIf you are having any issues with your account, please wait\nThanks!\npushpanshuranjansingh.com"
+        s.sendmail(sender_email, receiver_email, message)
+        s.quit() 
         print(request.data["email"], request.data['otp'])
-        # sys.stdout.writelines(lines= request.data["email"] + request.data['otp'])
-        # sys.stdout.flush()
-
-
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-            server.login(sender_email, password)
-            server.sendmail(sender_email, receiver_email, message)
-            return HttpResponse(server.noop())
-
+        return HttpResponse('Mail sent successfuly')
