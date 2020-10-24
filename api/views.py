@@ -91,14 +91,15 @@ class ChangePasswordView(generics.UpdateAPIView):
 import smtplib
 class SendMail(APIView):
     def post(self, request, *args, **kwargs):
-        s = smtplib.SMTP('smtp.gmail.com', 587)
-        s.starttls()
-        sender_email = "spushpanshu@gmail.com"  # Enter your address
-        receiver_email = [request.data["email"]]
-        password = "shashi123"
-        s.login(sender_email,password)
-        message = "Subject: "+request.data["subject"]+"\n"+"Your one time pin (OTP) code is: "+request.data['otp']+"\nOTP is valid for the next 15 minutes only.\nIf you are having any issues with your account, please wait\nThanks!\npushpanshuranjansingh.com"
-        s.sendmail(sender_email, receiver_email, message)
-        s.quit() 
-        print(request.data["email"], request.data['otp'])
-        return HttpResponse('Mail sent successfuly')
+        try:
+            server = smtplib.SMTP_SSL('smtp.zoho.in', 465)
+            server.ehlo()
+            server.login('pushpanshuranjansingh@zohomail.in', 'Shashi@123')
+
+            message = 'Subject: {}\n\n{}'.format(request.data["subject"], request.data['otp'])
+            server.sendmail('pushpanshuranjansingh@zohomail.in', request.data["email"], message.encode("utf8"))
+            server.quit()
+            return HttpResponse('Mail sent successfuly')
+        except Exception as ex:
+            print(ex)
+            return HttpResponse('Mail sent unsuccessfuly')
