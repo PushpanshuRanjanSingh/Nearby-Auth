@@ -94,7 +94,7 @@ class SendMail(APIView):
         try:
             server = smtplib.SMTP_SSL('smtp.zoho.in', 465)
             server.ehlo()
-            server.login('pushpanshuranjansingh@zohomail.in', 'Shashi@123')
+            server.login('pushpanshuranjansingh@zohomail.in', '<password>')
 
             message = 'Subject: {}\n\n{}'.format(request.data["subject"], request.data['otp'])
             server.sendmail('pushpanshuranjansingh@zohomail.in', request.data["email"], message.encode("utf8"))

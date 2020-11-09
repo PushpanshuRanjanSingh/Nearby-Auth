@@ -67,7 +67,10 @@ web: gunicorn nearbyauth.wsgi
 ```
 
 
+
 ## Deployement on AWS EC2 ##
+
+
 
 Step : 1
 
@@ -107,13 +110,14 @@ Step : 4
 
 ```sh
 pip install gunicorn
+sudo apt-get install supervisor
 sudo apt-get install -y nginx
 # edit inbound in aws : add http:80  source=> anywhere
 ```
 
 Step : 5
 
-test your project that it works or not
+test your project that it is  working or not
 ```sh
 # you can check your wsgi 
 $ cat settings.py | grep wsgi
@@ -195,3 +199,50 @@ sudo nano /etc/nginx/nginx.conf
 server_names_hash_bucket_size 512;
 sudo service nginx restart
 ```
+
+
+
+### Amazon EC2 : Add Domain and Redirect to Https
+
+**Requirements &  process**
+
+
+
+> **Process Step :** 
+>
+> 1. **Associate Elastic IP**
+> 2. **Create Route 53**
+> 3. **Request Certificate Manger**
+> 4. **Create Load Balancer**
+
+
+
+- **Elastic IP**
+  - Associate with Instance
+
+- **Certificate Manager**
+  - Request a public certificate
+  - Add domain Names
+  - DNS Validation
+  - Review & Request 
+    - Add CNAME to Route 53
+- **Load Balancer**
+  - Classic Load Balancer
+  - Load Balancer Protocol Choose
+    -  http 
+    -  https
+  - Select security group 
+    - select those which one is associated with instance
+  - Configure Health Check
+    - ping path - '/'
+  - Connect EC2 instance -> Review
+  - Select Load Balancer
+    - Description: Migrate now
+    - Listener: Select **HTTP : 80** > edit rules > **THEN** > edit > delete action & Select **Redirect to**
+
+- **Route 53** 
+  - Route 53 create hosted zone 
+    - [NS] default provide nameserver -> add 4 nameserver into your domin panel
+    - [A] add load balancer as alias [yes]
+    - [CNAME] add ssl certificate dns config
+    - [SOA] default provided
